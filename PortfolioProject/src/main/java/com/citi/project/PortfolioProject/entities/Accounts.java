@@ -11,7 +11,7 @@ public class Accounts implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id") int id;
+    @Column(name="id") private Integer id;
     @Column(name="amount") private Double amount;
     @Column(name="type") private String type;
     @Column(name="name") private String name;
@@ -20,7 +20,7 @@ public class Accounts implements Serializable {
     public Accounts() {
     }
 
-    public Accounts(int id, Double amount, String type, String name, List<Securities> securitiesList) {
+    public Accounts(Integer id, Double amount, String type, String name, List<Securities> securitiesList) {
         this.id = id;
         this.amount = amount;
         this.type = type;
@@ -28,18 +28,24 @@ public class Accounts implements Serializable {
         this.securitiesList = securitiesList;
     }
 
-    public Accounts(int id, Double amount, String type, String name) {
+    public Accounts(Integer id, Double amount, String type, String name) {
         this.id = id;
         this.amount = amount;
         this.type = type;
         this.name = name;
     }
 
-    public int getId() {
+    public Accounts(Double amount, String type, String name) {
+        this.amount = amount;
+        this.type = type;
+        this.name = name;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -83,5 +89,11 @@ public class Accounts implements Serializable {
     public void addSecurity(Securities security){
         this.securitiesList.add(security);
     }
+
+//    TODO Might need another removal by ID method
+    public void removeSecurity(Securities security){
+        this.securitiesList.remove(security);
+    }
+
 
 }

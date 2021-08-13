@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class AccountsServiceImp implements AccountsService {
 
@@ -18,9 +20,16 @@ public class AccountsServiceImp implements AccountsService {
         return repository.findAll();
     }
     @Transactional(propagation= Propagation.REQUIRED)
-    public Accounts getAccountById(int id){
-        return repository.getById(id);
+    public Accounts getAccountById(Integer id){
+//        return repository.findById(id);
+        Optional<Accounts> accountOptional =  repository.findById(id);
+        if (accountOptional.isPresent()) {
+            return accountOptional.get();
+        }
+        else return null;
     }
+
+
 
 
 }

@@ -5,6 +5,6 @@ import com.citi.project.PortfolioProject.entities.Accounts;
 public interface AccountsService {
 
     public Iterable<Accounts> getAccounts();
-    public Accounts getAccountById(int id);
+    public Accounts getAccountById(Integer id);
 
 }

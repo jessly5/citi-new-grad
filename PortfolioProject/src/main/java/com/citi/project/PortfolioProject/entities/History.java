@@ -10,7 +10,7 @@ public class History implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id") private int id;
+    @Column(name="id") private Integer id;
     @Column(name="account_type") private String account_type;
     @Column(name="transaction_date") private Date transaction_date;
     @Column(name="amount") private Double amount;
@@ -19,7 +19,7 @@ public class History implements Serializable {
     public History() {
     }
 
-    public History(int id, String accountType, Date transactionDate, Double amount, Integer accountID) {
+    public History(Integer id, String accountType, Date transactionDate, Double amount, Integer accountID) {
         this.id = id;
         this.account_type = accountType;
         this.transaction_date = transactionDate;
@@ -27,11 +27,11 @@ public class History implements Serializable {
         this.account_id = accountID;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

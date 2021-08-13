@@ -10,7 +10,7 @@ public class Securities implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") public int id;
+    @Column(name = "id") public Integer id;
     @Column(name = "type") public String type;
     @Column(name = "symbol") public String symbol;
     @Column(name = "holdings") public Integer holdings;
@@ -22,7 +22,7 @@ public class Securities implements Serializable {
     public Securities() {
     }
 
-    public Securities(int id, String type, String symbol, Integer holdings, Double purchaseCost, Double closingCost, Double currentCost, Integer accountId) {
+    public Securities(Integer id, String type, String symbol, Integer holdings, Double purchaseCost, Double closingCost, Double currentCost, Integer accountId) {
         this.id = id;
         this.type = type;
         this.symbol = symbol;
@@ -33,7 +33,7 @@ public class Securities implements Serializable {
         this.account_id = accountId;
     }
 
-    public Securities(int id, String type, String symbol, Integer holdings, Double purchaseCost, Integer accountId) {
+    public Securities(Integer id, String type, String symbol, Integer holdings, Double purchaseCost, Integer accountId) {
         this.id = id;
         this.type = type;
         this.symbol = symbol;
@@ -46,11 +46,11 @@ public class Securities implements Serializable {
        
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
