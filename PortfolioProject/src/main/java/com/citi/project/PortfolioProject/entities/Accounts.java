@@ -68,7 +68,7 @@ public class Accounts implements Serializable {
     }
 
     // Adding relationships
-    @JoinColumn(name="accountId", referencedColumnName="id")
+    @JoinColumn(name="account_id", referencedColumnName="id")
     @OneToMany( cascade={CascadeType.MERGE, CascadeType.PERSIST})
     private List<Securities> securitiesList = new ArrayList<Securities>();
 

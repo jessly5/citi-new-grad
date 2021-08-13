@@ -10,14 +10,14 @@ public class Securities implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id") public int id;
+    @Column(name = "id") public int id;
     @Column(name = "type") public String type;
     @Column(name = "symbol") public String symbol;
     @Column(name = "holdings") public Integer holdings;
-    @Column(name = "purchaseCost") public Double purchaseCost;
-    @Column(name = "closingCost") public Double closingCost;
-    @Column(name = "currentCost") public Double currentCost;
-    @Column(name="accountId") public Integer accountId;
+    @Column(name = "purchase_cost") public Double purchase_cost;
+    @Column(name = "closing_cost") public Double closing_cost;
+    @Column(name = "current_cost") public Double current_cost;
+    @Column(name = "account_id") public Integer account_id;
 
     public Securities() {
     }
@@ -27,10 +27,10 @@ public class Securities implements Serializable {
         this.type = type;
         this.symbol = symbol;
         this.holdings = holdings;
-        this.purchaseCost = purchaseCost;
-        this.closingCost = closingCost;
-        this.currentCost = currentCost;
-        this.accountId = accountId;
+        this.purchase_cost = purchaseCost;
+        this.closing_cost = closingCost;
+        this.current_cost = currentCost;
+        this.account_id = accountId;
     }
 
     public Securities(int id, String type, String symbol, Integer holdings, Double purchaseCost, Integer accountId) {
@@ -38,11 +38,11 @@ public class Securities implements Serializable {
         this.type = type;
         this.symbol = symbol;
         this.holdings = holdings;
-        this.purchaseCost = purchaseCost;
-        this.accountId = accountId;
-        this.currentCost = purchaseCost;
+        this.purchase_cost = purchaseCost;
+        this.account_id = accountId;
+        this.current_cost = purchaseCost;
         Random r = new Random();
-        this.closingCost= (purchaseCost-1.0) + (1.0) * r.nextDouble();
+        this.closing_cost = (purchaseCost-1.0) + (1.0) * r.nextDouble();
        
     }
 
@@ -78,35 +78,35 @@ public class Securities implements Serializable {
         this.holdings = holdings;
     }
 
-    public Double getPurchaseCost() {
-        return purchaseCost;
+    public Double getPurchase_cost() {
+        return purchase_cost;
     }
 
-    public void setPurchaseCost(Double purchaseCost) {
-        this.purchaseCost = purchaseCost;
+    public void setPurchase_cost(Double purchase_cost) {
+        this.purchase_cost = purchase_cost;
     }
 
-    public Double getClosingCost() {
-        return closingCost;
+    public Double getClosing_cost() {
+        return closing_cost;
     }
 
-    public void setClosingCost(Double closingCost) {
-        this.closingCost = closingCost;
+    public void setClosing_cost(Double closing_cost) {
+        this.closing_cost = closing_cost;
     }
 
-    public Double getCurrentCost() {
-        return currentCost;
+    public Double getCurrent_cost() {
+        return current_cost;
     }
 
-    public void setCurrentCost(Double currentCost) {
-        this.currentCost = currentCost;
+    public void setCurrent_cost(Double current_cost) {
+        this.current_cost = current_cost;
     }
 
     public Integer getAccountId() {
-        return accountId;
+        return account_id;
     }
 
     public void setAccountId(Integer accountId) {
-        this.accountId = accountId;
+        this.account_id = accountId;
     }
 }
