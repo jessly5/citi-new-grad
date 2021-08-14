@@ -97,14 +97,9 @@ public class TestAccountRepo {
 
     @Test
     public void canRetrieveByAccountName() {
-        Iterable<Accounts> accounts = repo.findByName("Wealth Simple");
-        Stream<Accounts> stream = StreamSupport.stream(accounts.spliterator(), false);
-
-        for (Accounts a1 :accounts) {
-            System.out.println("Account: " +a1.getName());
-        }
-        System.out.println(accounts.toString());
-        assertThat(stream.count(), equalTo(1L));
+        Accounts account = repo.findByName("Wealth Simple");
+        System.out.println(account.toString());
+        assertThat(account.getId(), equalTo(acc1Id));
     }
 
     @Test

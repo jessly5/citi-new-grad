@@ -7,7 +7,7 @@ public interface AccountRepository extends JpaRepository<Accounts, Integer> {
 
     public Iterable<Accounts> findByType(String type);
 
-    public Iterable<Accounts> findByName(String type);
+    public Accounts findByName(String type);
 
   //  public Iterable<Securities> re
 }

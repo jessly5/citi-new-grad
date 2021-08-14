@@ -3,6 +3,7 @@ package com.citi.project.PortfolioProject.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Entity
@@ -94,6 +95,19 @@ public class Accounts implements Serializable {
     public void removeSecurity(Securities security){
         this.securitiesList.remove(security);
     }
+    public double removeSecurityBySymbol(String symbol) {
+        double totalValue=0;
+        Iterator<Securities> i = securitiesList.iterator();
+        while (i.hasNext()) {
+            Securities currSecurities = i.next();
+            if (currSecurities.getSymbol().equals(symbol)) {
+                totalValue+=currSecurities.getHoldings()*currSecurities.getCurrent_cost();
+                i.remove();
+            }
+        }
+        return totalValue;
+    }
+
 
     @JoinColumn(name="account_id", referencedColumnName="id")
     @OneToMany ( cascade={CascadeType.MERGE, CascadeType.PERSIST})
