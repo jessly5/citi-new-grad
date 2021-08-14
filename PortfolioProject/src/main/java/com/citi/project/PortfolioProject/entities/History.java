@@ -27,6 +27,19 @@ public class History implements Serializable {
         this.account_id = accountID;
     }
 
+    public History(String account_type, Date transaction_date, Double amount, Integer account_id) {
+        this.account_type = account_type;
+        this.transaction_date = transaction_date;
+        this.amount = amount;
+        this.account_id = account_id;
+    }
+
+    public History(String account_type, Date transaction_date, Double amount) {
+        this.account_type = account_type;
+        this.transaction_date = transaction_date;
+        this.amount = amount;
+    }
+
     public Integer getId() {
         return id;
     }

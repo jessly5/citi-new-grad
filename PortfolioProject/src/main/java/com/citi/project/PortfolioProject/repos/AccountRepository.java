@@ -9,5 +9,5 @@ public interface AccountRepository extends JpaRepository<Accounts, Integer> {
 
     public Iterable<Accounts> findByName(String type);
 
-
+  //  public Iterable<Securities> re
 }

@@ -82,7 +82,7 @@ public class Accounts implements Serializable {
         return securitiesList;
     }
 
-    public void setTrackTitles(List<Securities> securitiesList) {
+    public void setSecuritiesList(List<Securities> securitiesList) {
         this.securitiesList = securitiesList;
     }
 
@@ -95,5 +95,18 @@ public class Accounts implements Serializable {
         this.securitiesList.remove(security);
     }
 
+    @JoinColumn(name="account_id", referencedColumnName="id")
+    @OneToMany ( cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    private List<History> historyList = new ArrayList<>();
 
+    public List<History> getHistoryList() {
+        return historyList;
+    }
+
+    public void setHistoryList(List<History> historyList) {
+        this.historyList = historyList;
+    }
+    public void addHistory(History history){
+        this.historyList.add(history);
+    }
 }

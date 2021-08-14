@@ -46,6 +46,15 @@ public class Securities implements Serializable {
        
     }
 
+    public Securities(String type, String symbol, Integer holdings, Double purchase_cost, Double closing_cost, Double current_cost) {
+        this.type = type;
+        this.symbol = symbol;
+        this.holdings = holdings;
+        this.purchase_cost = purchase_cost;
+        this.closing_cost = closing_cost;
+        this.current_cost = current_cost;
+    }
+
     public Integer getId() {
         return id;
     }
