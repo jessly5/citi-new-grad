@@ -48,50 +48,53 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
-    public void addSecurity(Securities security, int invest_account_id, int purchase_account_id) {
-        Optional<Accounts> accountOptional = repository.findById(invest_account_id);
-        if (accountOptional.isPresent()) {
-            accountOptional.get().addSecurity(security);
+    public void addSecurity(Securities security, String invest_account_name, String purchase_account_name) {
+        Accounts account=getAccountByName(invest_account_name);
+        Accounts cashAccount=getAccountByName(invest_account_name);
+        double money = security.getHoldings()*security.getCurrent_cost();
+        if (cashAccount.getAmount() >= money){
+            account.addSecurity(security);
+            updateAccountCashAmount(purchase_account_name, -money);
+        } else {
+            //in case of being poor
         }
-//        historyRepositor
+
+        //TODO: change from void to boolean, in case of failure
     }
 
     @Override
-    public void removeSecurity(Securities security, int invest_account_id, int cash_account_id) {
-        Optional<Accounts> accountOptional = repository.findById(invest_account_id);
-        if (accountOptional.isPresent()) {
-            accountOptional.get().removeSecurity(security);
-        }
+    public void removeSecurity(Securities security, String invest_account_name, String cash_account_name){
+        Accounts account=getAccountByName(invest_account_name);
+        account.removeSecurity(security);
+        double money = security.getHoldings()*security.getCurrent_cost();
+        updateAccountCashAmount(cash_account_name, money);
 
     }
 
     @Override
-    public void removeAllSecurityBySymbol(String symbol, int invest_account_id, int cash_account_id) {
-        Optional<Accounts> accountOptional = repository.findById(invest_account_id);
-//        double totalValue=0;
-        if (accountOptional.isPresent()) {
-//          update amount in invest account
-            double totalValue= accountOptional.get().removeSecurityBySymbol(symbol);
-            updateAccountCashAmount(cash_account_id, totalValue);
-//          update the history table
-            History h1= new History("cash", new Date(), totalValue);
-            History h2= new History("investment", new Date(), -totalValue);
-            accountOptional.get().addHistory(h2);
-            Accounts cashAccount= getAccountById(cash_account_id);
-            cashAccount.addHistory(h1);
-        }
-    }
-
-    @Override
-    public void updateAccountCashAmount(int account_id, double changeInCash){
-        Accounts account=getAccountById(account_id);
+    public void updateAccountCashAmount(String account_name, double changeInCash){
+        Accounts account=getAccountByName(account_name);
         account.setAmount(account.getAmount()+changeInCash);
+        History h1 = new History("cash", new Date(), changeInCash);
+        account.addHistory(h1);
     }
 
+    @Override
+    public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name) {
+        Accounts account=getAccountByName(invest_account_name);
+        double totalValue= account.removeSecurityBySymbol(symbol);
+        updateAccountCashAmount(cash_account_name, totalValue);
 
+    }
 
-
-
+    @Override
+    public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity) {
+        Accounts account=getAccountByName(invest_account_name);
+        double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
+        if (totalValue > 0) {
+            updateAccountCashAmount(invest_account_name, totalValue);
+        }
+    }
 
 
 }

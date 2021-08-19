@@ -123,4 +123,32 @@ public class Accounts implements Serializable {
     public void addHistory(History history){
         this.historyList.add(history);
     }
+
+    public void updateAmount(double change){
+        this.amount+=change;
+    }
+
+    public double removeSecurityQuantityBySymbol(String symbol, int quantity){
+        //for now, assume no duplicates
+
+        double totalValue=0;
+        int currentQuantity=0;
+        ArrayList<Integer> indexes = new ArrayList<>();
+        for (int i=0; i < securitiesList.size() ; i++) {
+            if (securitiesList.get(i).getSymbol().equals(symbol)) {
+                currentQuantity += securitiesList.get(i).getHoldings();
+                indexes.add(i);
+            }
+        }
+
+        if (currentQuantity >= quantity){
+            securitiesList.get(indexes.get(0)).setHoldings(currentQuantity-quantity);
+            return quantity*securitiesList.get(indexes.get(0)).getCurrent_cost();
+
+        } else {
+            return 0.0;
+        }
+
+    }
+
 }

@@ -9,16 +9,9 @@ public interface AccountsService {
     public Accounts getAccountById(Integer id);
     public Accounts getAccountByName(String name);
     public Iterable<Accounts> getAccountByType(String type);
-    public void addSecurity(Securities security, int invest_account_id, int cash_account_id);
-    public void removeSecurity(Securities security, int invest_account_id, int cash_account_id);
-
-    //sell all securities with given symbol
-    public void removeAllSecurityBySymbol(String symbol, int invest_account_id, int cash_account_id);
-    public void updateAccountCashAmount(int account_id, double changeInCash);
-
-
-
-
-
-
+    public void addSecurity(Securities security, String invest_account_name, String cash_account_name);
+    public void removeSecurity(Securities security, String invest_account_name, String cash_account_name);
+    public void updateAccountCashAmount(String account_name, double changeInCash);
+    public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name);
+    public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity);
 }
