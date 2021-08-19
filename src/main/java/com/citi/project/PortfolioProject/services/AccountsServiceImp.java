@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,7 +53,9 @@ public class AccountsServiceImp implements AccountsService {
     public void addSecurity(Securities security, String invest_account_name, String purchase_account_name) {
         Accounts account=getAccountByName(invest_account_name);
         Accounts cashAccount=getAccountByName(invest_account_name);
+
         double money = security.getHoldings()*security.getCurrent_cost();
+
         if (cashAccount.getAmount() >= money){
             account.addSecurity(security);
             updateAccountCashAmount(purchase_account_name, -money);
@@ -93,6 +97,15 @@ public class AccountsServiceImp implements AccountsService {
         double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
         if (totalValue > 0) {
             updateAccountCashAmount(invest_account_name, totalValue);
+        }
+    }
+
+    @Override
+    public void calculateInvestmentSummary() {
+        Iterable<Accounts> accounts = getAccountByType("investment");
+        for(Accounts acc: accounts){
+            List<Securities> sec = acc.getSecuritiesList();
+
         }
     }
 
