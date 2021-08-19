@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/PortfolioProject/PortfolioProject.iml" filepath="$PROJECT_DIR$/PortfolioProject/PortfolioProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/citi-new-grad.iml" filepath="$PROJECT_DIR$/.idea/citi-new-grad.iml" />
+    </modules>
+  </component>
+</project>
