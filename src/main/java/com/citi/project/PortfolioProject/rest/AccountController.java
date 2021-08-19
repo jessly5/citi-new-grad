@@ -6,6 +6,8 @@ import com.citi.project.PortfolioProject.services.AccountsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/account")
 @CrossOrigin
@@ -29,23 +31,20 @@ public class AccountController {
         return accountsService.getAccountByName(name);
     }
 
-//    @RequestMapping(method = RequestMethod.POST)
-//    public void addSecurity(@RequestBody String type, String symbol, Integer holdings, Double purchase_cost) {
-//        Securities temp = new Securities(type, symbol, holdings, purchase_cost);
-//        System.out.println(symbol);
-//        accountsService.addSecurity(temp, "Wealth Simple", "RBC");
-//
-//    }
-//    @RequestMapping(method = RequestMethod.POST)
-//    public void addSecurity(@RequestBody Securities security/*, String investment_account, String cash_account*/) {
-//        System.out.println(security.getCurrent_cost());
-//        accountsService.addSecurity(security, "Wealth Simple", "RBC");
-//
-//    }
+    @RequestMapping(method = RequestMethod.POST)
+    public void addSecurity(@RequestBody Securities security, @RequestParam("cashAccount") String cashAccount) {
+        accountsService.addSecurity(security, "Wealth Simple", cashAccount);
+    }
 
+    @RequestMapping(method = RequestMethod.PUT)
+    public void updateAccountCashAmount(@RequestBody Map<String, String> input){
+        System.out.println(input.get("account_name").toString());
+        System.out.println(input.get("changeInCash"));
+        accountsService.updateAccountCashAmount(input.get("account_name"), Double.parseDouble(input.get("changeInCash")));
+    }
 
-
-
+    //from the document
+    //GET: valuation summary (3 types), changes in everything, market movers (top 5 whatever)
 
 //    public void addSecurity(Securities security, String invest_account_name, String cash_account_name);
 //    public void removeSecurity(Securities security, String invest_account_name, String cash_account_name);

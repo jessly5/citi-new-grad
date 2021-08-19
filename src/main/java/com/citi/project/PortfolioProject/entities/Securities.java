@@ -10,14 +10,14 @@ public class Securities implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id") public Integer id;
-    @Column(name = "type") public String type;
-    @Column(name = "symbol") public String symbol;
-    @Column(name = "holdings") public Integer holdings;
-    @Column(name = "purchase_cost") public Double purchase_cost;
-    @Column(name = "closing_cost") public Double closing_cost;
-    @Column(name = "current_cost") public Double current_cost;
-    @Column(name = "account_id") public Integer account_id;
+    @Column(name = "id") private Integer id;
+    @Column(name = "type") private String type;
+    @Column(name = "symbol") private String symbol;
+    @Column(name = "holdings") private Integer holdings;
+    @Column(name = "purchase_cost") private Double purchase_cost;
+    @Column(name = "closing_cost") private Double closing_cost;
+    @Column(name = "current_cost") private Double current_cost;
+    @Column(name = "account_id") private Integer account_id;
 
     public Securities() {
     }
@@ -43,7 +43,6 @@ public class Securities implements Serializable {
         this.current_cost = purchaseCost;
         Random r = new Random();
         this.closing_cost = (purchaseCost-1.0) + (1.0) * r.nextDouble();
-       
     }
 
 
@@ -62,8 +61,7 @@ public class Securities implements Serializable {
         this.holdings = holdings;
         this.purchase_cost = purchase_cost;
         this.current_cost = purchase_cost;
-      //  Random r = new Random();
-       this.closing_cost = purchase_cost;
+        this.closing_cost = purchase_cost;
     }
 
     public Integer getId() {
@@ -126,7 +124,7 @@ public class Securities implements Serializable {
         return account_id;
     }
 
-    public void setAccountId(Integer accountId) {
-        this.account_id = accountId;
+    public void setAccount_id(Integer account_id) {
+        this.account_id = account_id;
     }
 }

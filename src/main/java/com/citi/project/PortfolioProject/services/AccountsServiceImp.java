@@ -51,17 +51,26 @@ public class AccountsServiceImp implements AccountsService {
 
     @Override
     public void addSecurity(Securities security, String invest_account_name, String purchase_account_name) {
-        Accounts account=getAccountByName(invest_account_name);
-        Accounts cashAccount=getAccountByName(invest_account_name);
+        security.setCurrent_cost(security.getPurchase_cost());
+        security.setClosing_cost(security.getPurchase_cost());
+
+        System.out.println("\n\n");
+        System.out.println(security.getAccountId());
+        System.out.println(purchase_account_name);
+
+        Accounts account=getAccountById(security.getAccountId());
+        //Accounts cashAccount=getAccountByName(invest_account_name);
 
         double money = security.getHoldings()*security.getCurrent_cost();
 
-        if (cashAccount.getAmount() >= money){
-            account.addSecurity(security);
-            updateAccountCashAmount(purchase_account_name, -money);
-        } else {
-            //in case of being poor
-        }
+        //if (cashAccount.getAmount() >= money){
+        account.addSecurity(security);
+            //updateAccountCashAmount(purchase_account_name, -money);
+//        } else {
+//            //in case of being poor
+//        }
+
+        repository.save(account);
 
         //TODO: change from void to boolean, in case of failure
     }
@@ -79,8 +88,10 @@ public class AccountsServiceImp implements AccountsService {
     public void updateAccountCashAmount(String account_name, double changeInCash){
         Accounts account=getAccountByName(account_name);
         account.setAmount(account.getAmount()+changeInCash);
-        History h1 = new History("cash", new Date(), changeInCash);
+        History h1 = new History("cash", new Date(), changeInCash, account.getId());
         account.addHistory(h1);
+        System.out.println(account.getId());
+        repository.save(account);
     }
 
     @Override
@@ -105,7 +116,10 @@ public class AccountsServiceImp implements AccountsService {
         Iterable<Accounts> accounts = getAccountByType("investment");
         for(Accounts acc: accounts){
             List<Securities> sec = acc.getSecuritiesList();
-
+            double total = 0;
+            for(Securities s: sec){
+                total += s.getHoldings() * s.getCurrent_cost(); // to fix
+            }
         }
     }
 

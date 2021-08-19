@@ -5,5 +5,8 @@ Content-type: application/json
   "type" : "stock",
   "symbol" : "temp",
   "holdings" : "5",
-  "purchase_cost" : "13.2"
+  "purchase_cost" : "13.2",
+  "account_id" : "4",
+  "cashAccount" : "RBC"
 }
+
