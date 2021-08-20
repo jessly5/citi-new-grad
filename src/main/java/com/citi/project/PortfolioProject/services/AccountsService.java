@@ -15,5 +15,8 @@ public interface AccountsService {
     public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name);
     public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity);
     public void calculateInvestmentSummary();
+    public Iterable<Accounts> updateAllSecuirtyInfo();
+
+
 
 }

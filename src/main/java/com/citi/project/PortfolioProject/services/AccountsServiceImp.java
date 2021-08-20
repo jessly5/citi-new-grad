@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import yahoofinance.Stock;
+import yahoofinance.YahooFinance;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +31,7 @@ public class AccountsServiceImp implements AccountsService {
     public Iterable<Accounts> getAccounts(){
         return repository.findAll();
     }
+
     @Transactional(propagation= Propagation.REQUIRED)
     public Accounts getAccountById(Integer id){
 //        return repository.findById(id);
@@ -39,17 +43,20 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public Accounts getAccountByName(String name) {
        Accounts account =  repository.findByName(name);
        return account;
     }
 
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public Iterable<Accounts> getAccountByType(String type) {
         return repository.findByType(type);
     }
 
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public void addSecurity(Securities security, String invest_account_name, String purchase_account_name) {
         security.setCurrent_cost(security.getPurchase_cost());
         security.setClosing_cost(security.getPurchase_cost());
@@ -76,6 +83,7 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
+
     public void removeSecurity(Securities security, String invest_account_name, String cash_account_name){
         Accounts account=getAccountByName(invest_account_name);
         account.removeSecurity(security);
@@ -121,6 +129,30 @@ public class AccountsServiceImp implements AccountsService {
                 total += s.getHoldings() * s.getCurrent_cost(); // to fix
             }
         }
+    }
+
+    @Override
+    public Iterable<Accounts> updateAllSecuirtyInfo() {
+        Iterable<Accounts> accounts = getAccountByType("investment");
+        for(Accounts acc: accounts){
+            List<Securities> sec = acc.getSecuritiesList();
+            for(Securities s: sec) {
+
+                try {
+                    System.out.println(s.getSymbol());
+                    Stock stock = YahooFinance.get(s.getSymbol());
+                    s.setCurrent_cost(stock.getQuote().getPrice().doubleValue()) ;
+                    s.setClosing_cost(stock.getQuote().getPreviousClose().doubleValue());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }catch(NullPointerException e2){
+                    e2.printStackTrace();
+                }
+            }
+            repository.save(acc);
+
+        }
+        return accounts;
     }
 
 
