@@ -54,7 +54,7 @@ public class TestAccountRepo {
     @BeforeEach
     public  void setupDatabaseEntryForReadOnlyTests() {
         Accounts acc1 = new Accounts(9000.00,"investment", "Wealth Simple");
-        Securities securities = new Securities( "Stock", "APPL", 2, 30.5, 75.3, 74.2);
+        Securities securities = new Securities( "Stock", "APPL", 2, 75.3, 74.2);
         acc1.addSecurity(securities);
         Accounts result1 = manager.persist(acc1);
         acc1Id = result1.getId();
@@ -87,7 +87,7 @@ public class TestAccountRepo {
     public void canAddSecurity(){
         Optional<Accounts> ac = repo.findById(acc1Id);
         Accounts a1 =  ac.get();
-        Securities securities = new Securities( "Stock", "GOOGL", 2, 20.5, 35.3, 34.2);
+        Securities securities = new Securities( "Stock", "GOOGL", 2,  35.3, 34.2);
         a1.addSecurity(securities);
         repo.save(a1);
         Optional<Accounts> ac2 = repo.findById(acc1Id);

@@ -1,0 +1,8 @@
+DELETE http://localhost:8080/account
+Content-type: application/json
+
+{
+  "symbol" : "APPL",
+  "account_name" : "Fort Trade",
+  "cash_account" : "RBC"
+}

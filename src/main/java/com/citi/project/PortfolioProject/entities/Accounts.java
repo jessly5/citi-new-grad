@@ -88,7 +88,19 @@ public class Accounts implements Serializable {
     }
 
     public void addSecurity(Securities security){
-        this.securitiesList.add(security);
+        boolean owned=false;
+        for (Securities sec:securitiesList){
+            if(sec.getSymbol().equals(security.getSymbol())){
+                sec.setHoldings(sec.getHoldings()+security.getHoldings());
+                sec.setCurrent_cost(security.getCurrent_cost());
+                sec.setClosing_cost(security.getClosing_cost());
+                owned=true;
+                break;
+            }
+        }
+        if(!owned) {
+            this.securitiesList.add(security);
+        }
     }
 
 //    TODO Might need another removal by ID method

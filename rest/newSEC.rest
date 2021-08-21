@@ -3,10 +3,9 @@ Content-type: application/json
 
 {
   "type" : "stock",
-  "symbol" : "temp",
+  "symbol" : "GM",
   "holdings" : "5",
-  "purchase_cost" : "13.2",
   "account_id" : "4",
-  "cashAccount" : "RBC"
+  "cash_account" : "RBC"
 }
 

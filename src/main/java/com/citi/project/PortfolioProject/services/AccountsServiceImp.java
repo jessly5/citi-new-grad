@@ -45,7 +45,9 @@ public class AccountsServiceImp implements AccountsService {
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
     public Accounts getAccountByName(String name) {
+        System.out.println("Name: " + name);
        Accounts account =  repository.findByName(name);
+
        return account;
     }
 
@@ -57,33 +59,31 @@ public class AccountsServiceImp implements AccountsService {
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public void addSecurity(Securities security, String invest_account_name, String purchase_account_name) {
-        security.setCurrent_cost(security.getPurchase_cost());
-        security.setClosing_cost(security.getPurchase_cost());
+    public Securities addSecurity(Securities security/*, String invest_account_name, String purchase_account_name*/) throws IOException {
+        Stock stock = YahooFinance.get(security.getSymbol());
+        security.setCurrent_cost(stock.getQuote().getPrice().doubleValue());
+        security.setClosing_cost(stock.getQuote().getPreviousClose().doubleValue());
 
-        System.out.println("\n\n");
-        System.out.println(security.getAccountId());
-        System.out.println(purchase_account_name);
-
-        Accounts account=getAccountById(security.getAccountId());
-        //Accounts cashAccount=getAccountByName(invest_account_name);
+        Accounts account=getAccountById(security.getAccount_id());
+        Accounts cashAccount=getAccountByName(security.getCash_account());
 
         double money = security.getHoldings()*security.getCurrent_cost();
 
-        //if (cashAccount.getAmount() >= money){
-        account.addSecurity(security);
-            //updateAccountCashAmount(purchase_account_name, -money);
-//        } else {
-//            //in case of being poor
-//        }
+        if (cashAccount.getAmount() >= money){
+            account.addSecurity(security);      //will add to existing secuirty if same symbol
+            updateAccountCashAmount(security.getCash_account(), -money);
+        } else {
+            //in case of being poor
+            return null;
+        }
 
         repository.save(account);
-
+        return security;
         //TODO: change from void to boolean, in case of failure
     }
 
     @Override
-
+    @Transactional(propagation= Propagation.REQUIRED)
     public void removeSecurity(Securities security, String invest_account_name, String cash_account_name){
         Accounts account=getAccountByName(invest_account_name);
         account.removeSecurity(security);
@@ -93,8 +93,9 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
+    //@Transactional(propagation= Propagation.REQUIRED)
     public void updateAccountCashAmount(String account_name, double changeInCash){
-        Accounts account=getAccountByName(account_name);
+        Accounts account=repository.findByName(account_name);//getAccountByName(account_name);
         account.setAmount(account.getAmount()+changeInCash);
         History h1 = new History("cash", new Date(), changeInCash, account.getId());
         account.addHistory(h1);
@@ -103,14 +104,31 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name) {
+        System.out.println("\n\n\n");
+        System.out.println(symbol);
+        System.out.println(invest_account_name);
+        System.out.println(cash_account_name);
         Accounts account=getAccountByName(invest_account_name);
+        Accounts account2=getAccountByName(cash_account_name);
         double totalValue= account.removeSecurityBySymbol(symbol);
-        updateAccountCashAmount(cash_account_name, totalValue);
+        account.updateAmount(-totalValue);
+    //    updateAccountCashAmount(cash_account_name, totalValue);
+        account2.setAmount(account.getAmount()+totalValue);
+        System.out.println("\n\n\n");
+        System.out.println("here");
+        History h1 = new History("cash", new Date(), totalValue, account.getId());
+        account2.addHistory(h1);
+
+        repository.save(account);
+        repository.save(account2);
 
     }
 
+
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity) {
         Accounts account=getAccountByName(invest_account_name);
         double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
@@ -120,6 +138,7 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public void calculateInvestmentSummary() {
         Iterable<Accounts> accounts = getAccountByType("investment");
         for(Accounts acc: accounts){
@@ -128,10 +147,13 @@ public class AccountsServiceImp implements AccountsService {
             for(Securities s: sec){
                 total += s.getHoldings() * s.getCurrent_cost(); // to fix
             }
+            acc.setAmount(total);
+            repository.save(acc);
         }
     }
 
     @Override
+    @Transactional(propagation= Propagation.REQUIRED)
     public Iterable<Accounts> updateAllSecuirtyInfo() {
         Iterable<Accounts> accounts = getAccountByType("investment");
         for(Accounts acc: accounts){
@@ -152,7 +174,33 @@ public class AccountsServiceImp implements AccountsService {
             repository.save(acc);
 
         }
+        //update amount
+        calculateInvestmentSummary();
         return accounts;
+    }
+
+    @Override
+    @Transactional(propagation= Propagation.REQUIRED)
+    public Iterable<String> summarizePortfolio() {
+        Iterable<Accounts> accounts= getAccounts();
+        double netWorth=0;
+        double cashAmount =0;
+        double investmentAmount=0;
+        for (Accounts acc: accounts){
+            if(acc.getType().equals("cash")){
+                cashAmount+=acc.getAmount();
+            }else if(acc.getType().equals("investment")){
+                investmentAmount+=acc.getAmount();
+            }
+        }
+        netWorth = cashAmount+investmentAmount;
+
+        List<String> summaryData = new ArrayList<>();
+        summaryData.add("Net Worth: " + netWorth);
+        summaryData.add("Cash Value: " + cashAmount);
+        summaryData.add("Investment Value: " + investmentAmount);
+
+        return summaryData;
     }
 
 

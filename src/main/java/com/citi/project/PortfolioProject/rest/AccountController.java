@@ -6,6 +6,7 @@ import com.citi.project.PortfolioProject.services.AccountsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -31,22 +32,37 @@ public class AccountController {
         return accountsService.getAccountByName(name);
     }
 
+    //TODO add appropriate url
     @RequestMapping(method = RequestMethod.POST)
-    public void addSecurity(@RequestBody Securities security, @RequestParam("cashAccount") String cashAccount) {
-        accountsService.addSecurity(security, "Wealth Simple", cashAccount);
+    public void addSecurity(@RequestBody Securities security) {
+        try {
+            Securities addedSecurity = accountsService.addSecurity(security);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    //TODO add appropriate url
     @RequestMapping(method = RequestMethod.PUT)
     public void updateAccountCashAmount(@RequestBody Map<String, String> input){
-        System.out.println(input.get("account_name").toString());
-        System.out.println(input.get("changeInCash"));
         accountsService.updateAccountCashAmount(input.get("account_name"), Double.parseDouble(input.get("changeInCash")));
     }
 
-    @RequestMapping(method = RequestMethod.GET, value="/update/Data")
+    @RequestMapping(method = RequestMethod.GET, value="/updateData")
     public Iterable<Accounts> retrieveLatestData(){
         return accountsService.updateAllSecuirtyInfo();
     }
+
+    @RequestMapping(method = RequestMethod.GET, value="/portfolioSummary")
+    public Iterable<String> getAccountSummary(){
+        return accountsService.summarizePortfolio();
+    }
+
+    @RequestMapping(method=RequestMethod.DELETE)
+    public void sellAllOfSecurity(@RequestBody Map<String, String> input){
+        accountsService.removeAllSecurityBySymbol(input.get("symbol"), input.get("account_name"), input.get("cash_account"));
+    }
+
     //from the document
     //GET: valuation summary (3 types), changes in everything, market movers (top 5 whatever)
 

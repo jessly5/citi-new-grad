@@ -42,7 +42,7 @@ public class TestSecuritiesRepo {
     @BeforeEach
     public  void setupDatabaseEntryForReadOnlyTests() {
         Accounts acc1 = new Accounts(9000.00,"investment", "Wealth Simple");
-        Securities securities = new Securities( "Stock", "APPL", 2, 30.5, 75.3, 74.2);
+        Securities securities = new Securities( "Stock", "APPL", 2, 75.3, 74.2);
         acc1.addSecurity(securities);
         Accounts result1 = manager.persist(acc1);
         acc1Id = result1.getId();
