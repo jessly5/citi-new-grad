@@ -1,4 +1,4 @@
-POST http://localhost:8080/account
+POST http://localhost:8080/account/buySecurity
 Content-type: application/json
 
 {

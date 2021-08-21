@@ -1,5 +1,8 @@
 package com.citi.project.PortfolioProject.entities;
 
+import com.citi.project.PortfolioProject.repos.SecurityRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ public class Accounts implements Serializable {
         this.type = type;
         this.name = name;
     }
+
 
     public Integer getId() {
         return id;
@@ -87,6 +91,17 @@ public class Accounts implements Serializable {
         this.securitiesList = securitiesList;
     }
 
+    public Iterable<Securities> findBySymbol(String symbol){
+        List<Securities> toDelete = new ArrayList<>();
+        for(Securities s: securitiesList){
+            if(s.getSymbol().equals(symbol)){
+                toDelete.add(s);
+            }
+        }
+
+        return toDelete;
+    }
+
     public void addSecurity(Securities security){
         boolean owned=false;
         for (Securities sec:securitiesList){
@@ -122,7 +137,7 @@ public class Accounts implements Serializable {
 
 
     @JoinColumn(name="account_id", referencedColumnName="id")
-    @OneToMany ( cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @OneToMany ( cascade={CascadeType.MERGE, CascadeType.REMOVE})
     private List<History> historyList = new ArrayList<>();
 
     public List<History> getHistoryList() {
@@ -144,22 +159,18 @@ public class Accounts implements Serializable {
         //for now, assume no duplicates
 
         double totalValue=0;
-        int currentQuantity=0;
-        ArrayList<Integer> indexes = new ArrayList<>();
-        for (int i=0; i < securitiesList.size() ; i++) {
-            if (securitiesList.get(i).getSymbol().equals(symbol)) {
-                currentQuantity += securitiesList.get(i).getHoldings();
-                indexes.add(i);
+
+        for(Securities s: securitiesList){
+            if(s.getSymbol().equals(symbol)){
+                if(s.getHoldings()>quantity){
+                    s.setHoldings(s.getHoldings()-quantity);
+                    return quantity*s.getCurrent_cost();
+                }else if(s.getHoldings()==quantity){
+                    return -1.0;
+                }
             }
         }
-
-        if (currentQuantity >= quantity){
-            securitiesList.get(indexes.get(0)).setHoldings(currentQuantity-quantity);
-            return quantity*securitiesList.get(indexes.get(0)).getCurrent_cost();
-
-        } else {
-            return 0.0;
-        }
+        return 0.0;
 
     }
 

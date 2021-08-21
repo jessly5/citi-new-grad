@@ -33,7 +33,7 @@ CREATE TABLE `conygre`.`securities` (
   `closing_cost` DECIMAL(13,2) NOT NULL,
   `current_cost` DECIMAL(13,2) NOT NULL,
   `cash_account` VARCHAR(45),
-  `account_id` INT NOT NULL,
+  `account_id` INT,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_accounts_securities`
     FOREIGN KEY (`account_id`)

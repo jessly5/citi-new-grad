@@ -1,8 +1,9 @@
-DELETE http://localhost:8080/account
+PUT http://localhost:8080/account/sellSecurity
 Content-type: application/json
 
 {
-  "symbol" : "APPL",
-  "account_name" : "Fort Trade",
-  "cash_account" : "RBC"
+  "symbol" : "BABA",
+  "account_name" : "Wealth Simple",
+  "cash_account" : "RBC",
+  "quantity" : "2"
 }

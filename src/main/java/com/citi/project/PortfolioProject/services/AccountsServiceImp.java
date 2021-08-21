@@ -5,6 +5,7 @@ import com.citi.project.PortfolioProject.entities.History;
 import com.citi.project.PortfolioProject.entities.Securities;
 import com.citi.project.PortfolioProject.repos.AccountRepository;
 import com.citi.project.PortfolioProject.repos.HistoryRepository;
+import com.citi.project.PortfolioProject.repos.SecurityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,7 +26,7 @@ public class AccountsServiceImp implements AccountsService {
     private AccountRepository repository;
 
     @Autowired
-    private HistoryRepository historyRepository;
+    private SecurityRepository securityRepository;
 
     @Transactional(propagation= Propagation.REQUIRED)
     public Iterable<Accounts> getAccounts(){
@@ -45,10 +46,16 @@ public class AccountsServiceImp implements AccountsService {
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
     public Accounts getAccountByName(String name) {
-        System.out.println("Name: " + name);
        Accounts account =  repository.findByName(name);
-
        return account;
+    }
+
+    @Override
+    public void addNewAccount(Accounts account) {
+        if(account.getAmount()==null){
+            account.setAmount(0.0);
+        }
+        repository.save(account);
     }
 
     @Override
@@ -82,15 +89,15 @@ public class AccountsServiceImp implements AccountsService {
         //TODO: change from void to boolean, in case of failure
     }
 
-    @Override
-    @Transactional(propagation= Propagation.REQUIRED)
-    public void removeSecurity(Securities security, String invest_account_name, String cash_account_name){
-        Accounts account=getAccountByName(invest_account_name);
-        account.removeSecurity(security);
-        double money = security.getHoldings()*security.getCurrent_cost();
-        updateAccountCashAmount(cash_account_name, money);
-
-    }
+//    @Override
+//    @Transactional(propagation= Propagation.REQUIRED)
+//    public void removeSecurity(Securities security, String invest_account_name, String cash_account_name){
+//        Accounts account=getAccountByName(invest_account_name);
+//        account.removeSecurity(security);
+//        double money = security.getHoldings()*security.getCurrent_cost();
+//        updateAccountCashAmount(cash_account_name, money);
+//
+//    }
 
     @Override
     //@Transactional(propagation= Propagation.REQUIRED)
@@ -99,30 +106,24 @@ public class AccountsServiceImp implements AccountsService {
         account.setAmount(account.getAmount()+changeInCash);
         History h1 = new History("cash", new Date(), changeInCash, account.getId());
         account.addHistory(h1);
-        System.out.println(account.getId());
         repository.save(account);
     }
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
     public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name) {
-        System.out.println("\n\n\n");
-        System.out.println(symbol);
-        System.out.println(invest_account_name);
-        System.out.println(cash_account_name);
         Accounts account=getAccountByName(invest_account_name);
-        Accounts account2=getAccountByName(cash_account_name);
+
+        // maybe try to combine the following 2 lines?
+        Iterable<Securities> securitiesToDelete = account.findBySymbol(symbol);
         double totalValue= account.removeSecurityBySymbol(symbol);
         account.updateAmount(-totalValue);
-    //    updateAccountCashAmount(cash_account_name, totalValue);
-        account2.setAmount(account.getAmount()+totalValue);
-        System.out.println("\n\n\n");
-        System.out.println("here");
-        History h1 = new History("cash", new Date(), totalValue, account.getId());
-        account2.addHistory(h1);
-
         repository.save(account);
-        repository.save(account2);
+        for(Securities s: securitiesToDelete){
+            securityRepository.delete(s);
+        }
+
+        updateAccountCashAmount(cash_account_name, totalValue);
 
     }
 
@@ -131,10 +132,19 @@ public class AccountsServiceImp implements AccountsService {
     @Transactional(propagation= Propagation.REQUIRED)
     public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity) {
         Accounts account=getAccountByName(invest_account_name);
+//TODO handle case when quantity=holdings
         double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
-        if (totalValue > 0) {
+        if(totalValue>0.0){
+            account.updateAmount(-totalValue);
+            repository.save(account);
             updateAccountCashAmount(invest_account_name, totalValue);
+        }else if(totalValue==-1.0){     //chosen value is in fact all that is owned
+            removeAllSecurityBySymbol(symbol, invest_account_name, cash_account_name);
+        }else if(totalValue==0.0){
+            // when trying to sell more than owned -- don't let person do this
         }
+
+
     }
 
     @Override
@@ -145,7 +155,7 @@ public class AccountsServiceImp implements AccountsService {
             List<Securities> sec = acc.getSecuritiesList();
             double total = 0;
             for(Securities s: sec){
-                total += s.getHoldings() * s.getCurrent_cost(); // to fix
+                total += s.getHoldings() * s.getCurrent_cost(); // to fix ????
             }
             acc.setAmount(total);
             repository.save(acc);
@@ -154,7 +164,7 @@ public class AccountsServiceImp implements AccountsService {
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public Iterable<Accounts> updateAllSecuirtyInfo() {
+    public Iterable<Accounts> updateAllSecurityInfo() {
         Iterable<Accounts> accounts = getAccountByType("investment");
         for(Accounts acc: accounts){
             List<Securities> sec = acc.getSecuritiesList();
@@ -180,6 +190,11 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
+    public Iterable<Securities> getAllSecurities() {
+        return securityRepository.findAll();
+    }
+
+    @Override
     @Transactional(propagation= Propagation.REQUIRED)
     public Iterable<String> summarizePortfolio() {
         Iterable<Accounts> accounts= getAccounts();
@@ -201,6 +216,13 @@ public class AccountsServiceImp implements AccountsService {
         summaryData.add("Investment Value: " + investmentAmount);
 
         return summaryData;
+    }
+
+    @Override
+    public Iterable<Securities> getSecuritiesInAccount(Integer id) {
+        Accounts account = getAccountById(id);
+        return account.getSecuritiesList();
+
     }
 
 

@@ -1,0 +1,8 @@
+POST http://localhost:8080/account
+Content-type: application/json
+
+{
+  "name" : "temp",
+  "type" : "cash",
+  "amount" : "2000"
+}

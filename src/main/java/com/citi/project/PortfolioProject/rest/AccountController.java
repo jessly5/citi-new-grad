@@ -33,8 +33,9 @@ public class AccountController {
     }
 
     //TODO add appropriate url
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value="/buySecurity")
     public void addSecurity(@RequestBody Securities security) {
+
         try {
             Securities addedSecurity = accountsService.addSecurity(security);
         } catch (IOException e) {
@@ -43,14 +44,14 @@ public class AccountController {
     }
 
     //TODO add appropriate url
-    @RequestMapping(method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT, value="/depositMoney")
     public void updateAccountCashAmount(@RequestBody Map<String, String> input){
         accountsService.updateAccountCashAmount(input.get("account_name"), Double.parseDouble(input.get("changeInCash")));
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/updateData")
     public Iterable<Accounts> retrieveLatestData(){
-        return accountsService.updateAllSecuirtyInfo();
+        return accountsService.updateAllSecurityInfo();
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/portfolioSummary")
@@ -58,11 +59,32 @@ public class AccountController {
         return accountsService.summarizePortfolio();
     }
 
-    @RequestMapping(method=RequestMethod.DELETE)
+    @RequestMapping(method=RequestMethod.DELETE, value="/sellSecurity")
     public void sellAllOfSecurity(@RequestBody Map<String, String> input){
         accountsService.removeAllSecurityBySymbol(input.get("symbol"), input.get("account_name"), input.get("cash_account"));
     }
 
+    //TODO is PUT the right choice here?
+    @RequestMapping(method = RequestMethod.PUT, value="/sellSecurity")
+    public void sellQuantityOfSecurity(@RequestBody Map<String,String> input){
+        accountsService.removeSomeSecuritiesBySymbol(input.get("symbol"), input.get("account_name"), input.get("cash_account"),
+                Integer.parseInt(input.get("quantity")));
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public void addAccount(@RequestBody Accounts account){
+        accountsService.addNewAccount(account);
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/allSecurities")
+    public Iterable<Securities> getAllSecurities(){
+        return accountsService.getAllSecurities();
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/{id}/securities")
+    public Iterable<Securities> getSecuritiesInAccount(@PathVariable("id") Integer id){
+        return accountsService.getSecuritiesInAccount(id);
+    }
     //from the document
     //GET: valuation summary (3 types), changes in everything, market movers (top 5 whatever)
 
