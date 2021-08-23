@@ -85,12 +85,5 @@ public class AccountController {
     public Iterable<Securities> getSecuritiesInAccount(@PathVariable("id") Integer id){
         return accountsService.getSecuritiesInAccount(id);
     }
-    //from the document
-    //GET: valuation summary (3 types), changes in everything, market movers (top 5 whatever)
 
-//
-//    public void removeSecurity(Securities security, String invest_account_name, String cash_account_name);
-//    public void updateAccountCashAmount(String account_name, double changeInCash);
-//    public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name);
-//    public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity);
 }
