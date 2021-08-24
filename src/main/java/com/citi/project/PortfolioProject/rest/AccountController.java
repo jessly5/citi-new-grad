@@ -3,6 +3,7 @@ package com.citi.project.PortfolioProject.rest;
 import com.citi.project.PortfolioProject.entities.Accounts;
 import com.citi.project.PortfolioProject.entities.Securities;
 import com.citi.project.PortfolioProject.services.AccountsService;
+import org.aspectj.lang.annotation.DeclareWarning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -111,4 +112,10 @@ public class AccountController {
     public Iterable<Securities> getDailyLosers(){
         return accountsService.getWorstDailyPerformers();
     }
+    
+    @RequestMapping(method=RequestMethod.GET, value="/testWeekly")
+    public Double getWeeklyChange(){
+        return  accountsService.getWeeklyChanges();
+    }
+    
 }

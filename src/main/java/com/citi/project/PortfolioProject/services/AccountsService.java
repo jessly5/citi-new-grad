@@ -27,7 +27,7 @@ public interface AccountsService {
     public Iterable<Securities> getTopDailyPerformers();
     public Iterable<Securities> getWorstDailyPerformers();
     public Iterable<Securities> getSecuritiesInAccount(Integer id);
-
+    public Double getWeeklyChanges();
 
 
 }

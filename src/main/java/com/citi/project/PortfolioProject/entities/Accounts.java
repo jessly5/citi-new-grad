@@ -137,7 +137,7 @@ public class Accounts implements Serializable {
 
 
     @JoinColumn(name="account_id", referencedColumnName="id")
-    @OneToMany ( cascade={CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToMany ( cascade={CascadeType.ALL, CascadeType.REMOVE})
     private List<History> historyList = new ArrayList<>();
 
     public List<History> getHistoryList() {
