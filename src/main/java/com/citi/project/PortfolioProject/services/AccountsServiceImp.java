@@ -14,10 +14,7 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AccountsServiceImp implements AccountsService {
@@ -196,26 +193,30 @@ public class AccountsServiceImp implements AccountsService {
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public Iterable<String> summarizePortfolio() {
-        Iterable<Accounts> accounts= getAccounts();
-        double netWorth=0;
+    public Double summarizeCash() {
+        Iterable<Accounts> accounts= getAccountByType("cash");
         double cashAmount =0;
+        for (Accounts acc: accounts){
+            cashAmount+=acc.getAmount();
+        }
+        return cashAmount;
+    }
+
+    @Override
+    @Transactional(propagation= Propagation.REQUIRED)
+    public Double summarizeInvsetments(){
+        Iterable<Accounts> accounts= getAccountByType("investment");
         double investmentAmount=0;
         for (Accounts acc: accounts){
-            if(acc.getType().equals("cash")){
-                cashAmount+=acc.getAmount();
-            }else if(acc.getType().equals("investment")){
-                investmentAmount+=acc.getAmount();
-            }
+            investmentAmount+=acc.getAmount();
         }
-        netWorth = cashAmount+investmentAmount;
+        return investmentAmount;
+    }
 
-        List<String> summaryData = new ArrayList<>();
-        summaryData.add("Net Worth: " + netWorth);
-        summaryData.add("Cash Value: " + cashAmount);
-        summaryData.add("Investment Value: " + investmentAmount);
-
-        return summaryData;
+    @Override
+    @Transactional(propagation= Propagation.REQUIRED)
+    public Double summarizeNetWorth(){
+        return summarizeCash()+summarizeInvsetments();
     }
 
     @Override
@@ -223,6 +224,41 @@ public class AccountsServiceImp implements AccountsService {
         Accounts account = getAccountById(id);
         return account.getSecuritiesList();
 
+    }
+
+    @Override
+    public Iterable<Securities> getTopDailyPerformers() {
+        List<Securities> allSecurities = sortByPercentChange();
+        Collections.reverse(allSecurities);
+        if (allSecurities.size()<5){
+            return allSecurities;
+        }else{
+            return allSecurities.subList(0,5);
+        }
+
+    }
+
+    @Override
+    public Iterable<Securities> getWorstDailyPerformers() {
+        List<Securities> allSecurities = sortByPercentChange();
+        if (allSecurities.size()<5){
+            return allSecurities;
+        }else{
+            return allSecurities.subList(0,5);
+        }
+    }
+
+    private List<Securities> sortByPercentChange(){
+        Iterable<Securities> allSecurities = getAllSecurities();
+        List<Securities> result = new ArrayList<>();
+        allSecurities.forEach(result::add);
+        Collections.sort(result, new Comparator<Securities>() {
+            @Override
+            public int compare(Securities c1, Securities c2) {
+                return Double.compare((c1.getCurrent_cost()-c1.getClosing_cost())/c1.getClosing_cost(), (c2.getCurrent_cost()-c2.getClosing_cost())/c2.getClosing_cost());
+            }
+        });
+        return result;
     }
 
 

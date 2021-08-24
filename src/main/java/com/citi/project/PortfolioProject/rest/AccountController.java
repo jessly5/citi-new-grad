@@ -60,9 +60,19 @@ public class AccountController {
         return accountsService.updateAllSecurityInfo();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value="/portfolioSummary")
-    public Iterable<String> getAccountSummary(){
-        return accountsService.summarizePortfolio();
+    @RequestMapping(method = RequestMethod.GET, value="/cashAccountSummary")
+    public Double getCashSummary(){
+        return accountsService.summarizeCash();
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/investmentAccountSummary")
+    public Double getInvestmentSummary(){
+        return accountsService.summarizeInvsetments();
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/NetWorth")
+    public Double getNetWorth(){
+        return accountsService.summarizeNetWorth();
     }
 
     @RequestMapping(method=RequestMethod.DELETE, value="/sellSecurity")
@@ -92,4 +102,13 @@ public class AccountController {
         return accountsService.getSecuritiesInAccount(id);
     }
 
+    @RequestMapping(method=RequestMethod.GET, value="/dailyGainers")
+    public Iterable<Securities> getDailyGainers(){
+        return accountsService.getTopDailyPerformers();
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/dailyLosers")
+    public Iterable<Securities> getDailyLosers(){
+        return accountsService.getWorstDailyPerformers();
+    }
 }

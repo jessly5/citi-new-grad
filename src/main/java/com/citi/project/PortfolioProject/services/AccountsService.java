@@ -20,7 +20,12 @@ public interface AccountsService {
     public void calculateInvestmentSummary();
     public Iterable<Accounts> updateAllSecurityInfo();
     public Iterable<Securities> getAllSecurities();
-    public Iterable<String> summarizePortfolio();
+    public Double summarizeCash();
+    public Double summarizeInvsetments();
+    public Double summarizeNetWorth();
+
+    public Iterable<Securities> getTopDailyPerformers();
+    public Iterable<Securities> getWorstDailyPerformers();
     public Iterable<Securities> getSecuritiesInAccount(Integer id);
 
 
