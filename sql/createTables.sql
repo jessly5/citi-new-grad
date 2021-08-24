@@ -66,7 +66,7 @@ INSERT INTO accounts(amount, name, type) values
 
 INSERT INTO securities(type, symbol, holdings, closing_cost, current_cost, account_id) values
 ("stock","TSLA",2, 719.13, 722.25, 4),
-("stock","APPL",4, 148.89, 148.45, 4),
+("stock","AAPL",4, 148.89, 148.45, 4),
 ("stock","SPOT",4, 215.04, 214.02, 4),
 ("stock","DIS", 2, 179.29, 182.79, 5),
 ("stock","FB", 6, 362.65, 363.29, 5),
