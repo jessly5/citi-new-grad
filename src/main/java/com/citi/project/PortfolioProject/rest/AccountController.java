@@ -34,12 +34,9 @@ public class AccountController {
 
     //TODO USAMA ask if by name works (didnt for me) and merge if does.
     @RequestMapping(method=RequestMethod.GET,value = "/type/{type}")
-    public Iterable<Accounts>  getAccountByType(@PathVariable("type") String name){
-        return accountsService.getAccountByType("type");
+    public Iterable<Accounts>  getAccountByType(@PathVariable("type") String type){
+        return accountsService.getAccountByType(type);
     }
-
-//    AccountsServiceImp.getAccountByType
-    //accountsService.getAccountByType()
 
     //TODO add appropriate url
     @RequestMapping(method = RequestMethod.POST, value="/buySecurity")
