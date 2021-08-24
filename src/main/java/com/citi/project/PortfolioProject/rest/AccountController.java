@@ -69,8 +69,8 @@ public class AccountController {
     public Double getInvestmentSummary(){
         return accountsService.summarizeInvsetments();
     }
-    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(method = RequestMethod.GET, value="/NetWorth")
+    @CrossOrigin(origins = "http://localhost:4200")
     public Double getNetWorth(){
         return accountsService.summarizeNetWorth();
     }
