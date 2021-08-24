@@ -24,6 +24,9 @@ public class AccountsServiceImp implements AccountsService {
 
     @Autowired
     private SecurityRepository securityRepository;
+    
+    @Autowired
+    private HistoryRepository historyRepository;
 
     @Transactional(propagation= Propagation.REQUIRED)
     public Iterable<Accounts> getAccounts(){
@@ -63,7 +66,7 @@ public class AccountsServiceImp implements AccountsService {
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public Securities addSecurity(Securities security/*, String invest_account_name, String purchase_account_name*/) throws IOException {
+    public Securities addSecurity(Securities security) throws IOException {
         Stock stock = YahooFinance.get(security.getSymbol());
         security.setCurrent_cost(stock.getQuote().getPrice().doubleValue());
         security.setClosing_cost(stock.getQuote().getPreviousClose().doubleValue());
@@ -76,6 +79,8 @@ public class AccountsServiceImp implements AccountsService {
         if (cashAccount.getAmount() >= money){
             account.addSecurity(security);      //will add to existing secuirty if same symbol
             updateAccountCashAmount(security.getCash_account(), -money);
+            History history = new History("investment", new Date(), money, account.getId());
+            account.addHistory(history);
         } else {
             //in case of being poor
             return null;
@@ -115,6 +120,8 @@ public class AccountsServiceImp implements AccountsService {
         Iterable<Securities> securitiesToDelete = account.findBySymbol(symbol);
         double totalValue= account.removeSecurityBySymbol(symbol);
         account.updateAmount(-totalValue);
+        History history = new History("investment", new Date(), -totalValue, account.getId());
+        account.addHistory(history);
         repository.save(account);
         for(Securities s: securitiesToDelete){
             securityRepository.delete(s);
@@ -133,6 +140,8 @@ public class AccountsServiceImp implements AccountsService {
         double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
         if(totalValue>0.0){
             account.updateAmount(-totalValue);
+            History history = new History("investment", new Date(), -totalValue, account.getId());
+            account.addHistory(history);
             repository.save(account);
             updateAccountCashAmount(invest_account_name, totalValue);
         }else if(totalValue==-1.0){     //chosen value is in fact all that is owned
@@ -224,6 +233,22 @@ public class AccountsServiceImp implements AccountsService {
         Accounts account = getAccountById(id);
         return account.getSecuritiesList();
 
+    }
+
+    @Override
+    public Double getWeeklyChanges() {
+
+        long DAY_IN_MS = 1000 * 60 * 60 * 24;
+        Date weekAgo = new Date(System.currentTimeMillis() - (15 * DAY_IN_MS));
+        System.out.println(weekAgo.toString());
+        System.out.println("\n\n");
+        Iterable<History> hist= historyRepository.findByTransactionDateIsAfter(weekAgo);
+
+        for(History h: hist){
+            System.out.println(h.getTransactionDate());
+        }
+
+        return null;
     }
 
     @Override

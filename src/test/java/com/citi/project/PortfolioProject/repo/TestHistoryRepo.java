@@ -45,8 +45,12 @@ public class TestHistoryRepo {
         Accounts acc1 = new Accounts(9000.00,"investment", "Wealth Simple");
         Securities securities = new Securities( "Stock", "APPL", 2,  75.3, 74.2);
         acc1.addSecurity(securities);
+        History history = new History("investment", new Date(2021, 8, 2), 100D);
+        acc1.addHistory(history);
+
         Accounts result1 = manager.persist(acc1);
         acc1Id = result1.getId();
+
         Accounts acc2 = new Accounts(5000.00,"cash", "RBC");
         Accounts result2 = manager.persist(acc2);
     }
@@ -61,6 +65,14 @@ public class TestHistoryRepo {
         Stream<History> stream = StreamSupport.stream(h.spliterator(), false);
         assertThat(stream.count(), equalTo(1L));
 //tring account_type, Date transaction_date, Double amount
+    }
+
+    @Test
+    public void canGetAfterDate(){
+        Iterable<History> hist = repo.findByTransactionDateIsAfter(new Date(2021,8,3));
+        Stream<History> stream = StreamSupport.stream(hist.spliterator(), false);
+        assertThat(stream.count(), equalTo(0L));
+
     }
 
 }
