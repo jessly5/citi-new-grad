@@ -34,8 +34,8 @@ public class AccountController {
 
     //TODO USAMA ask if by name works (didnt for me) and merge if does.
     @RequestMapping(method=RequestMethod.GET,value = "/type/{type}")
-    public Accounts getAccountByType(@PathVariable("type") String name){
-        return accountsService.getAccountByName(name);
+    public Iterable<Accounts>  getAccountByType(@PathVariable("type") String name){
+        return accountsService.getAccountByType("type");
     }
 
 //    AccountsServiceImp.getAccountByType
