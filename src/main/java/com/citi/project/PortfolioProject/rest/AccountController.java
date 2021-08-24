@@ -70,8 +70,8 @@ public class AccountController {
     public Double getInvestmentSummary(){
         return accountsService.summarizeInvsetments();
     }
-
     @RequestMapping(method = RequestMethod.GET, value="/NetWorth")
+    @CrossOrigin
     public Double getNetWorth(){
         return accountsService.summarizeNetWorth();
     }
