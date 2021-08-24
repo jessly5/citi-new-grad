@@ -32,6 +32,15 @@ public class AccountController {
         return accountsService.getAccountByName(name);
     }
 
+    //TODO USAMA ask if by name works (didnt for me) and merge if does.
+    @RequestMapping(method=RequestMethod.GET,value = "/type/{type}")
+    public Accounts getAccountByType(@PathVariable("type") String name){
+        return accountsService.getAccountByName(name);
+    }
+
+//    AccountsServiceImp.getAccountByType
+    //accountsService.getAccountByType()
+
     //TODO add appropriate url
     @RequestMapping(method = RequestMethod.POST, value="/buySecurity")
     public void addSecurity(@RequestBody Securities security) {
