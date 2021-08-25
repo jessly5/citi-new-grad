@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -45,7 +46,13 @@ public class TestHistoryRepo {
         Accounts acc1 = new Accounts(9000.00,"investment", "Wealth Simple");
         Securities securities = new Securities( "Stock", "APPL", 2,  75.3, 74.2);
         acc1.addSecurity(securities);
-        History history = new History("investment", new Date(2021, 8, 2), 100D);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        cal.set(Calendar.DAY_OF_WEEK,1);
+        History history = new History("investment", cal.getTime(), 100D);
         acc1.addHistory(history);
 
         Accounts result1 = manager.persist(acc1);
@@ -75,4 +82,38 @@ public class TestHistoryRepo {
 
     }
 
+    @Test
+    public void canGetBetweenDate(){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+        Date date = cal.getTime();
+        System.out.println(date);
+        System.out.println(new Date());
+        Iterable<History> hist = repo.findByTransactionDateIsBetween(date, new Date());
+        for(History h: hist){
+            System.out.println(h.getTransactionDate());
+        }
+
+        Stream<History> stream = StreamSupport.stream(hist.spliterator(), false);
+        assertThat(stream.count(), equalTo(1L));
+    }
+
+    @Test public void canGetAtDate(){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
+        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+        Date date = cal.getTime();
+        Iterable<History> hist = repo.findByTransactionDate(date);
+        for(History h: hist){
+            System.out.println(h.getTransactionDate());
+        }
+
+        Stream<History> stream = StreamSupport.stream(hist.spliterator(), false);
+        assertThat(stream.count(), equalTo(1L));
+    }
 }

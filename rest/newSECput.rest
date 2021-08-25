@@ -1,4 +1,4 @@
-PUT http://localhost:8080/account/depositMoney
+PUT http://localhost:8080/depositMoney
 Content-type: application/json
 
 {

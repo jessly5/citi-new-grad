@@ -113,9 +113,14 @@ public class AccountController {
         return accountsService.getWorstDailyPerformers();
     }
     
-    @RequestMapping(method=RequestMethod.GET, value="/testWeekly")
-    public Double getWeeklyChange(){
-        return  accountsService.getWeeklyChanges();
+    @RequestMapping(method=RequestMethod.GET, value="/cashAndInvestmentHistory")
+    public Map<String, Double> getWeeklyChange(){
+        return  accountsService.getAllAccountChanges();
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/investmentYearHistory")
+    public Iterable<Double> getInvestmentYear(){
+        return accountsService.getInvestmentYearHistory();
     }
     
 }

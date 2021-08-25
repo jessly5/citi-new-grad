@@ -4,6 +4,7 @@ import com.citi.project.PortfolioProject.entities.Accounts;
 import com.citi.project.PortfolioProject.entities.Securities;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface AccountsService {
 
@@ -27,7 +28,8 @@ public interface AccountsService {
     public Iterable<Securities> getTopDailyPerformers();
     public Iterable<Securities> getWorstDailyPerformers();
     public Iterable<Securities> getSecuritiesInAccount(Integer id);
-    public Double getWeeklyChanges();
+    public Map<String, Double> getAllAccountChanges();
+    public Iterable<Double> getInvestmentYearHistory();
 
 
 }
