@@ -323,7 +323,7 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
-    public Iterable<Double> getInvestmentYearHistory() {
+    public Iterable<HistoryData> getInvestmentYearHistory() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
         cal.clear(Calendar.MINUTE);
@@ -348,12 +348,12 @@ public class AccountsServiceImp implements AccountsService {
             }
         });
 
-        List<Double> investment = new ArrayList<>();
+        List<HistoryData> investment = new ArrayList<HistoryData>();
         Double total = summarizeInvsetments();
-        investment.add(total);
-        investment.add(total-result.get(0).getAmount());
+        investment.add(new HistoryData(new Date(), total));
+        investment.add(new HistoryData(result.get(0).getTransactionDate(), total-result.get(0).getAmount()));
         for(int i =1;i<result.size();i++){
-            investment.add(investment.get(i)-result.get(i).getAmount());
+            investment.add(new HistoryData(result.get(i).getTransactionDate(), investment.get(i).getValue()-result.get(i).getAmount()));
         }
 
         Collections.reverse(investment);

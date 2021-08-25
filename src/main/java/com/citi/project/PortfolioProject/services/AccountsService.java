@@ -29,7 +29,7 @@ public interface AccountsService {
     public Iterable<Securities> getWorstDailyPerformers();
     public Iterable<Securities> getSecuritiesInAccount(Integer id);
     public Map<String, Double> getAllAccountChanges();
-    public Iterable<Double> getInvestmentYearHistory();
+    public Iterable<HistoryData> getInvestmentYearHistory();
 
 
 }

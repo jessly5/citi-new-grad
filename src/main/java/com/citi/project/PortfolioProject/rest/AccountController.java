@@ -3,6 +3,7 @@ package com.citi.project.PortfolioProject.rest;
 import com.citi.project.PortfolioProject.entities.Accounts;
 import com.citi.project.PortfolioProject.entities.Securities;
 import com.citi.project.PortfolioProject.services.AccountsService;
+import com.citi.project.PortfolioProject.services.HistoryData;
 import org.aspectj.lang.annotation.DeclareWarning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -119,7 +120,7 @@ public class AccountController {
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/investmentYearHistory")
-    public Iterable<Double> getInvestmentYear(){
+    public Iterable<HistoryData> getInvestmentYear(){
         return accountsService.getInvestmentYearHistory();
     }
     
