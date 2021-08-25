@@ -36,7 +36,6 @@ public class AccountsServiceImp implements AccountsService {
 
     @Transactional(propagation= Propagation.REQUIRED)
     public Accounts getAccountById(Integer id){
-//        return repository.findById(id);
         Optional<Accounts> accountOptional =  repository.findById(id);
         if (accountOptional.isPresent()) {
             return accountOptional.get();
@@ -52,11 +51,12 @@ public class AccountsServiceImp implements AccountsService {
     }
 
     @Override
-    public void addNewAccount(Accounts account) {
+    public Accounts addNewAccount(Accounts account) {
         if(account.getAmount()==null){
             account.setAmount(0.0);
         }
-        repository.save(account);
+        return repository.save(account);
+
     }
 
     @Override
@@ -73,41 +73,46 @@ public class AccountsServiceImp implements AccountsService {
         security.setClosing_cost(stock.getQuote().getPreviousClose().doubleValue());
 
         Accounts account=getAccountById(security.getAccount_id());
-        Accounts cashAccount=getAccountByName(security.getCash_account());
+        Accounts cashAccount=getAccountById(security.getCash_account_id());
 
         double money = security.getHoldings()*security.getCurrent_cost();
 
         if (cashAccount.getAmount() >= money){
             account.addSecurity(security);      //will add to existing secuirty if same symbol
-            updateAccountCashAmount(security.getCash_account(), -money);
+            cashAccount = cashAccountChanges(cashAccount, -money);
+            repository.save(cashAccount);
             History history = new History("investment", new Date(), money, account.getId());
             account.addHistory(history);
         } else {
             //in case of being poor
+            // Assuming front end will implement a check
             return null;
         }
-
+        calculateInvestmentSummary();
         repository.save(account);
         return security;
     }
 
-
-    @Override
-    //@Transactional(propagation= Propagation.REQUIRED)
-    public void updateAccountCashAmount(String account_name, double changeInCash){
-        Accounts account=repository.findByName(account_name);//getAccountByName(account_name);
+    private Accounts cashAccountChanges(Accounts account, double changeInCash){
         account.setAmount(account.getAmount()+changeInCash);
         History h1 = new History("cash", new Date(), changeInCash, account.getId());
         account.addHistory(h1);
+        return account;
+    }
+
+    @Override
+    @Transactional(propagation= Propagation.REQUIRED)
+    public void updateAccountCashAmount(Integer account_id, double changeInCash){
+        Accounts account=getAccountById(account_id);
+        account = cashAccountChanges(account, changeInCash);
         repository.save(account);
     }
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public void removeAllSecurityBySymbol(String symbol, String invest_account_name, String cash_account_name) {
-        Accounts account=getAccountByName(invest_account_name);
+    public void removeAllSecurityBySymbol(String symbol, Integer invest_account_id, Integer cash_account_id) {
+        Accounts account=getAccountById(invest_account_id);
 
-        // maybe try to combine the following 2 lines?
         Iterable<Securities> securitiesToDelete = account.findBySymbol(symbol);
         double totalValue= account.removeSecurityBySymbol(symbol);
         account.updateAmount(-totalValue);
@@ -117,30 +122,31 @@ public class AccountsServiceImp implements AccountsService {
         for(Securities s: securitiesToDelete){
             securityRepository.delete(s);
         }
-
-        updateAccountCashAmount(cash_account_name, totalValue);
+        calculateInvestmentSummary();
+        updateAccountCashAmount(cash_account_id, totalValue);
 
     }
 
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public void removeSomeSecuritiesBySymbol(String symbol, String invest_account_name, String cash_account_name, int quantity) {
-        Accounts account=getAccountByName(invest_account_name);
-//TODO handle case when quantity=holdings
+    public void removeSomeSecuritiesBySymbol(String symbol, Integer invest_account_id, Integer cash_account_id, int quantity) {
+        Accounts account=getAccountById(invest_account_id);
+
         double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
         if(totalValue>0.0){
             account.updateAmount(-totalValue);
             History history = new History("investment", new Date(), -totalValue, account.getId());
             account.addHistory(history);
             repository.save(account);
-            updateAccountCashAmount(invest_account_name, totalValue);
-        }else if(totalValue==-1.0){     //chosen value is in fact all that is owned
-            removeAllSecurityBySymbol(symbol, invest_account_name, cash_account_name);
+            updateAccountCashAmount(invest_account_id, totalValue);
+        }else if(totalValue == -1.0){     //chosen value is in fact all that is owned
+            removeAllSecurityBySymbol(symbol, invest_account_id, cash_account_id);
         }else if(totalValue==0.0){
-            // when trying to sell more than owned -- don't let person do this
+            // when trying to sell more than owned
+            // Assuming that front end will handle this
         }
-
+        calculateInvestmentSummary();
 
     }
 
@@ -166,7 +172,6 @@ public class AccountsServiceImp implements AccountsService {
         for(Accounts acc: accounts){
             List<Securities> sec = acc.getSecuritiesList();
             for(Securities s: sec) {
-
                 try {
                     System.out.println(s.getSymbol());
                     Stock stock = YahooFinance.get(s.getSymbol());
@@ -184,9 +189,8 @@ public class AccountsServiceImp implements AccountsService {
 
         calculateInvestmentSummary();
 
-
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.clear(Calendar.MINUTE);
         cal.clear(Calendar.SECOND);
         cal.clear(Calendar.MILLISECOND);
@@ -201,7 +205,6 @@ public class AccountsServiceImp implements AccountsService {
         }
 
         if(!exists){
-            System.out.println("creating new \n\n");
             History h = new History("investment", date,summarizeInvsetments() - prev);
             historyRepository.save(h);
         }
@@ -249,91 +252,77 @@ public class AccountsServiceImp implements AccountsService {
 
     }
 
-    @Override
-    public Map<String, Double> getAllAccountChanges() {
-        Double currentCash = this.summarizeCash();
-        Double cuttentInvest = this.summarizeInvsetments();
-        Map<String,Double> historicData=new HashMap<>();
+    private Calendar setHistoricDate(String type){
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
         cal.clear(Calendar.MINUTE);
         cal.clear(Calendar.SECOND);
         cal.clear(Calendar.MILLISECOND);
-        cal.add(Calendar.YEAR, -1);
-        DecimalFormat df = new DecimalFormat("#.##");
+        if(type.equals("year")){
+            cal.add(Calendar.YEAR, -1);
+        }else if(type.equals("month")){
+            cal.add(Calendar.MONTH, -1);
+        }else if(type.equals("week")){
+            cal.add(Calendar.WEEK_OF_YEAR, -1);
+        }
+        return cal;
+    }
 
-        Iterable<History> yearHist= historyRepository.findByTransactionDateIsAfter(cal.getTime());
-
-        Double yearCash=0.0;
-        Double yearInvest=0.0;
-        for(History h: yearHist){
+    private ArrayList<Double> calculateChangesOverTime(Iterable<History> hist){
+        Double cash=0.0;
+        Double invest=0.0;
+        for(History h: hist){
             if(h.getAccountType().equals("cash")){
-                yearCash+=h.getAmount();
+                cash+=h.getAmount();
             }else{
-                yearInvest+=h.getAmount();
+                invest+=h.getAmount();
             }
         }
-        historicData.put("Year Cash", Double.parseDouble(df.format(currentCash-yearCash)));
-        historicData.put("Year Investment", Double.parseDouble(df.format(cuttentInvest-yearInvest)));
+        ArrayList<Double> result = new ArrayList<>();
+        result.add(cash);
+        result.add(invest);
+        return result;
+    }
 
-        Calendar monthCal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
-        cal.clear(Calendar.MINUTE);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MILLISECOND);
-        monthCal.add(Calendar.MONTH, -1);
+
+    @Override
+    public Map<String, Double> getAllAccountChanges() {
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        Double currentCash = this.summarizeCash();
+        Double currentInvest = this.summarizeInvsetments();
+        Map<String,Double> historicData=new HashMap<>();
+
+        Calendar cal = setHistoricDate("year");
+        Iterable<History> yearHist= historyRepository.findByTransactionDateIsAfter(cal.getTime());
+
+        ArrayList<Double> year = calculateChangesOverTime(yearHist);
+        historicData.put("Year Cash", Double.parseDouble(df.format(currentCash-year.get(0))));
+        historicData.put("Year Investment", Double.parseDouble(df.format(currentInvest-year.get(1))));
+
+        Calendar monthCal =setHistoricDate("month");
 
         Iterable<History> monthHist= historyRepository.findByTransactionDateIsAfter(monthCal.getTime());
 
-        Double monthCash=0.0;
-        Double monthInvest=0.0;
-        for(History h: monthHist){
-            if(h.getAccountType().equals("cash")){
-                monthCash+=h.getAmount();
-            }else{
-                monthInvest+=h.getAmount();
-            }
-        }
-        historicData.put("Month Cash", Double.parseDouble(df.format(currentCash-monthCash)));
-        historicData.put("Month Investment", Double.parseDouble(df.format(cuttentInvest-monthInvest)));
+        ArrayList<Double> month = calculateChangesOverTime(monthHist);
+        historicData.put("Month Cash", Double.parseDouble(df.format(currentCash-month.get(0))));
+        historicData.put("Month Investment", Double.parseDouble(df.format(currentInvest-month.get(1))));
 
-        Calendar weekCal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
-        cal.clear(Calendar.MINUTE);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MILLISECOND);
-        weekCal.add(Calendar.WEEK_OF_YEAR, -1);
-
+        Calendar weekCal =  setHistoricDate("week");
         Iterable<History> weekHist= historyRepository.findByTransactionDateIsAfter(weekCal.getTime());
 
-        Double weekCash=0.0;
-        Double weekInvest=0.0;
-        for(History h: weekHist){
-            if(h.getAccountType().equals("cash")){
-                weekCash+=h.getAmount();
-            }else{
-                weekInvest+=h.getAmount();
-            }
-        }
-        historicData.put("Week Cash", Double.parseDouble(df.format(currentCash-weekCash)));
-        historicData.put("Week Investment", Double.parseDouble(df.format(cuttentInvest-weekInvest)));
-
-
+        ArrayList<Double> week = calculateChangesOverTime(weekHist);
+        historicData.put("Week Cash", Double.parseDouble(df.format(currentCash-week.get(0))));
+        historicData.put("Week Investment", Double.parseDouble(df.format(currentInvest-week.get(1))));
         return historicData;
     }
 
     @Override
     public Iterable<HistoryData> getInvestmentYearHistory() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
-        cal.clear(Calendar.MINUTE);
-        cal.clear(Calendar.SECOND);
-        cal.clear(Calendar.MILLISECOND);
-        cal.add(Calendar.YEAR, -1);
-        DecimalFormat df = new DecimalFormat("#.##");
+        Calendar cal =setHistoricDate("year");
+//        DecimalFormat df = new DecimalFormat("#.##");
 
         Iterable<History> yearHist= historyRepository.findByAccountTypeAndTransactionDateIsAfter("investment", cal.getTime());
-
 
         List<History> result = new ArrayList<>();
         yearHist.forEach(result::add);
@@ -348,7 +337,8 @@ public class AccountsServiceImp implements AccountsService {
             }
         });
 
-        List<HistoryData> investment = new ArrayList<HistoryData>();
+        List<HistoryData> investment = new ArrayList<>();
+
         Double total = summarizeInvsetments();
         investment.add(new HistoryData(new Date(), total));
         investment.add(new HistoryData(result.get(0).getTransactionDate(), total-result.get(0).getAmount()));
@@ -358,6 +348,18 @@ public class AccountsServiceImp implements AccountsService {
 
         Collections.reverse(investment);
         return investment;
+    }
+
+    @Override
+    public String deletAccount(Integer id) {
+        Accounts account = repository.getById(id);
+//        System.out.println(account.getSecuritiesList().isEmpty());
+        if(!account.getSecuritiesList().isEmpty() && account.getSecuritiesList().size()>0){
+            return "Can not remove account. Sell your securities first";
+        }
+        repository.delete(account);
+
+        return "Account removed";
     }
 
 
@@ -404,6 +406,5 @@ public class AccountsServiceImp implements AccountsService {
         });
         return result;
     }
-
 
 }

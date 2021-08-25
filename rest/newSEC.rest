@@ -1,4 +1,4 @@
-POST http://localhost:8080/account/buySecurity
+POST http://localhost:8080/buySecurity
 Content-type: application/json
 
 {
@@ -6,6 +6,6 @@ Content-type: application/json
   "symbol" : "GM",
   "holdings" : "5",
   "account_id" : "4",
-  "cash_account" : "RBC"
+  "cash_account" : "Wealth Simple"
 }
 

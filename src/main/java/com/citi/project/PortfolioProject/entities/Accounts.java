@@ -22,27 +22,15 @@ public class Accounts implements Serializable {
 
 
     public Accounts() {
+        securitiesList = new ArrayList<Securities>();
     }
 
-    public Accounts(Integer id, Double amount, String type, String name, List<Securities> securitiesList) {
-        this.id = id;
-        this.amount = amount;
-        this.type = type;
-        this.name = name;
-        this.securitiesList = securitiesList;
-    }
-
-    public Accounts(Integer id, Double amount, String type, String name) {
-        this.id = id;
-        this.amount = amount;
-        this.type = type;
-        this.name = name;
-    }
 
     public Accounts(Double amount, String type, String name) {
         this.amount = amount;
         this.type = type;
         this.name = name;
+        securitiesList = new ArrayList<Securities>();
     }
 
 
@@ -81,9 +69,10 @@ public class Accounts implements Serializable {
     // Adding relationships
     @JoinColumn(name="account_id", referencedColumnName="id")
     @OneToMany( cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    private List<Securities> securitiesList = new ArrayList<Securities>();
+    private List<Securities> securitiesList;// = new ArrayList<>();
 
     public List<Securities> getSecuritiesList() {
+
         return securitiesList;
     }
 
@@ -140,6 +129,7 @@ public class Accounts implements Serializable {
     @OneToMany ( cascade={CascadeType.ALL, CascadeType.REMOVE})
     private List<History> historyList = new ArrayList<>();
 
+
     public List<History> getHistoryList() {
         return historyList;
     }
@@ -156,9 +146,6 @@ public class Accounts implements Serializable {
     }
 
     public double removeSecurityQuantityBySymbol(String symbol, int quantity){
-        //for now, assume no duplicates
-
-        double totalValue=0;
 
         for(Securities s: securitiesList){
             if(s.getSymbol().equals(symbol)){

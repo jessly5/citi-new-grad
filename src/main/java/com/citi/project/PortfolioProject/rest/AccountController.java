@@ -34,7 +34,6 @@ public class AccountController {
         return accountsService.getAccountByName(name);
     }
 
-    //TODO USAMA ask if by name works (didnt for me) and merge if does.
     @RequestMapping(method=RequestMethod.GET,value = "/type/{type}")
     public Iterable<Accounts>  getAccountByType(@PathVariable("type") String type){
         return accountsService.getAccountByType(type);
@@ -51,10 +50,9 @@ public class AccountController {
         }
     }
 
-    //TODO add appropriate url
     @RequestMapping(method = RequestMethod.PUT, value="/depositMoney")
     public void updateAccountCashAmount(@RequestBody Map<String, String> input){
-        accountsService.updateAccountCashAmount(input.get("account_name"), Double.parseDouble(input.get("changeInCash")));
+        accountsService.updateAccountCashAmount(Integer.parseInt(input.get("account_id")), Double.parseDouble(input.get("changeInCash")));
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/updateData")
@@ -79,13 +77,12 @@ public class AccountController {
 
     @RequestMapping(method=RequestMethod.DELETE, value="/sellSecurity")
     public void sellAllOfSecurity(@RequestBody Map<String, String> input){
-        accountsService.removeAllSecurityBySymbol(input.get("symbol"), input.get("account_name"), input.get("cash_account"));
+        accountsService.removeAllSecurityBySymbol(input.get("symbol"), Integer.parseInt(input.get("invest_account_id")), Integer.parseInt(input.get("cash_account_id")));
     }
 
-    //TODO is PUT the right choice here?
     @RequestMapping(method = RequestMethod.PUT, value="/sellSecurity")
     public void sellQuantityOfSecurity(@RequestBody Map<String,String> input){
-        accountsService.removeSomeSecuritiesBySymbol(input.get("symbol"), input.get("account_name"), input.get("cash_account"),
+        accountsService.removeSomeSecuritiesBySymbol(input.get("symbol"), Integer.parseInt(input.get("invest_account_id")), Integer.parseInt(input.get("cash_account_id")),
                 Integer.parseInt(input.get("quantity")));
     }
 
@@ -123,5 +120,12 @@ public class AccountController {
     public Iterable<HistoryData> getInvestmentYear(){
         return accountsService.getInvestmentYearHistory();
     }
+
+    @RequestMapping(method=RequestMethod.DELETE, value="/{id}")
+    public String deleteAccount(@PathVariable("id") int id){
+//        System.out.println(name);
+        return accountsService.deletAccount(id);
+    }
+
     
 }

@@ -1,9 +1,9 @@
-PUT http://localhost:8080/account/sellSecurity
+PUT http://localhost:8080/sellSecurity
 Content-type: application/json
 
 {
   "symbol" : "BABA",
-  "account_name" : "Wealth Simple",
-  "cash_account" : "RBC",
+  "invest_account_id" : "5",
+  "cash_account_id" : "1",
   "quantity" : "2"
 }

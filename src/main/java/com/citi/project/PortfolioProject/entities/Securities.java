@@ -16,20 +16,20 @@ public class Securities implements Serializable {
     @Column(name = "holdings") private Integer holdings;
     @Column(name = "closing_cost") private Double closing_cost;
     @Column(name = "current_cost") private Double current_cost;
-    @Column(name = "cash_account") private String cash_account;
+    @Column(name = "cash_account_id") private Integer cash_account_id;
     @Column(name = "account_id") private Integer account_id;
 
     public Securities() {
     }
 
-    public Securities(Integer id, String type, String symbol, Integer holdings, Double closing_cost, Double current_cost, String cash_account, Integer account_id) {
+    public Securities(Integer id, String type, String symbol, Integer holdings, Double closing_cost, Double current_cost, Integer cash_account_id, Integer account_id) {
         this.id = id;
         this.type = type;
         this.symbol = symbol;
         this.holdings = holdings;
         this.closing_cost = closing_cost;
         this.current_cost = current_cost;
-        this.cash_account = cash_account;
+        this.cash_account_id = cash_account_id;
         this.account_id = account_id;
     }
 
@@ -63,12 +63,12 @@ public class Securities implements Serializable {
         this.closing_cost = purchase_cost;
     }
 
-    public String getCash_account() {
-        return cash_account;
+    public Integer getCash_account_id() {
+        return cash_account_id;
     }
 
-    public void setCash_account(String cash_account) {
-        this.cash_account = cash_account;
+    public void setCash_account_id(Integer cash_account_id) {
+        this.cash_account_id = cash_account_id;
     }
 
     public Integer getAccount_id() {
