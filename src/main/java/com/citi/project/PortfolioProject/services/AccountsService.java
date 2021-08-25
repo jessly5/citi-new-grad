@@ -35,5 +35,7 @@ public interface AccountsService {
 
     public String deletAccount(Integer id);
 
+    public Securities getInfoOnPotentialSecurity(String symbol);
+
 
 }

@@ -362,6 +362,21 @@ public class AccountsServiceImp implements AccountsService {
         return "Account removed";
     }
 
+    @Override
+    public Securities getInfoOnPotentialSecurity(String symbol) {
+        try {
+            Stock stock = YahooFinance.get(symbol);
+            Securities securities =new Securities();
+            securities.setCurrent_cost(stock.getQuote().getPrice().doubleValue());
+            securities.setClosing_cost(stock.getQuote().getPreviousClose().doubleValue());
+            return securities;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 
     @Override
     public Iterable<Securities> getTopDailyPerformers() {

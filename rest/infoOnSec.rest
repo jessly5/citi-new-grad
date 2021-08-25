@@ -1,0 +1,2 @@
+GET http://localhost:8080/securityInfo/GOOGL
+Content-type: application/json

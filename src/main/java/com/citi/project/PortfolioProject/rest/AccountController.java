@@ -121,6 +121,11 @@ public class AccountController {
         return accountsService.getInvestmentYearHistory();
     }
 
+    @RequestMapping(method=RequestMethod.GET, value="/securityInfo/{symbol}")
+    public Securities getInfoOnNewSecurity(@PathVariable("symbol") String symbol){
+        return accountsService.getInfoOnPotentialSecurity(symbol);
+    }
+
     @RequestMapping(method=RequestMethod.DELETE, value="/{id}")
     public String deleteAccount(@PathVariable("id") int id){
 //        System.out.println(name);
