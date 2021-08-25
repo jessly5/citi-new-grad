@@ -71,7 +71,7 @@ public class AccountController {
         return accountsService.summarizeInvsetments();
     }
     @CrossOrigin
-    @RequestMapping(method = RequestMethod.GET, value="/NetWorth")
+    @RequestMapping(method = RequestMethod.GET, value="/netWorth")
     public Double getNetWorth(){
         return accountsService.summarizeNetWorth();
     }
