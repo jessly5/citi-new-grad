@@ -255,22 +255,42 @@ public class AccountsServiceImp implements AccountsService {
     public Iterable<Securities> getTopDailyPerformers() {
         List<Securities> allSecurities = sortByPercentChange();
         Collections.reverse(allSecurities);
-        if (allSecurities.size()<5){
-            return allSecurities;
-        }else{
-            return allSecurities.subList(0,5);
+        List<Securities> toReturn = new ArrayList<>();
+        for(Securities s:allSecurities){
+            if(toReturn.size()==5){
+                break;
+            }
+            if(s.getCurrent_cost()>s.getClosing_cost()){
+                toReturn.add(s);
+            }
         }
+        return toReturn;
+//        if (allSecurities.size()<5){
+//            return allSecurities;
+//        }else{
+//            return allSecurities.subList(0,5);
+//        }
 
     }
 
     @Override
     public Iterable<Securities> getWorstDailyPerformers() {
         List<Securities> allSecurities = sortByPercentChange();
-        if (allSecurities.size()<5){
-            return allSecurities;
-        }else{
-            return allSecurities.subList(0,5);
+        List<Securities> toReturn = new ArrayList<>();
+        for(Securities s:allSecurities){
+            if(toReturn.size()==5){
+                break;
+            }
+            if(s.getCurrent_cost()<s.getClosing_cost()){
+                toReturn.add(s);
+            }
         }
+        return toReturn;
+//        if (allSecurities.size()<5){
+//            return allSecurities;
+//        }else{
+//            return allSecurities.subList(0,5);
+//        }
     }
 
     private List<Securities> sortByPercentChange(){
