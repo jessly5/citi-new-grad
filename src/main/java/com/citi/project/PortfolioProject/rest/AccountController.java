@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("")
 @CrossOrigin
 public class AccountController {
 
