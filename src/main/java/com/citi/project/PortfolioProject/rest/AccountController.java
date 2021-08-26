@@ -80,14 +80,13 @@ public class AccountController {
     }
 
     @RequestMapping(method=RequestMethod.DELETE, value="/sellSecurity")
-    public void sellAllOfSecurity(@RequestBody Map<String, String> input){
-        accountsService.removeAllSecurityBySymbol(input.get("symbol"), Integer.parseInt(input.get("invest_account_id")), Integer.parseInt(input.get("cash_account_id")));
+    public void sellAllOfSecurity(@RequestBody Securities security){
+        accountsService.removeAllSecurityBySymbol(security);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value="/sellSecurity")
-    public void sellQuantityOfSecurity(@RequestBody Map<String,String> input){
-        accountsService.removeSomeSecuritiesBySymbol(input.get("symbol"), Integer.parseInt(input.get("invest_account_id")), Integer.parseInt(input.get("cash_account_id")),
-                Integer.parseInt(input.get("quantity")));
+    public void sellQuantityOfSecurity(@RequestBody Securities security){
+        accountsService.removeSomeSecuritiesBySymbol(security);
     }
 
     @RequestMapping(method = RequestMethod.POST)

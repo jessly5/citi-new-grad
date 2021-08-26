@@ -2,7 +2,7 @@ PUT http://localhost:8080/depositMoney
 Content-type: application/json
 
 {
-  "account_name" : "RBC",
+  "account_id" : "RBC",
   "changeInCash" : "15"
 }
 

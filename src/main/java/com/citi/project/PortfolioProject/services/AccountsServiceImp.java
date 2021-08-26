@@ -111,11 +111,11 @@ public class AccountsServiceImp implements AccountsService {
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public void removeAllSecurityBySymbol(String symbol, Integer invest_account_id, Integer cash_account_id) {
-        Accounts account=getAccountById(invest_account_id);
+    public void removeAllSecurityBySymbol(Securities security) {
+        Accounts account=getAccountById(security.getAccount_id());
 
-        Iterable<Securities> securitiesToDelete = account.findBySymbol(symbol);
-        double totalValue= account.removeSecurityBySymbol(symbol);
+        Iterable<Securities> securitiesToDelete = account.findBySymbol(security.getSymbol());
+        double totalValue= account.removeSecurityBySymbol(security.getSymbol());
         account.updateAmount(-totalValue);
         History history = new History("investment", new Date(), -totalValue, account.getId());
         account.addHistory(history);
@@ -124,25 +124,25 @@ public class AccountsServiceImp implements AccountsService {
             securityRepository.delete(s);
         }
         calculateInvestmentSummary();
-        updateAccountCashAmount(cash_account_id, totalValue);
+        updateAccountCashAmount(security.getCash_account_id(), totalValue);
 
     }
 
 
     @Override
     @Transactional(propagation= Propagation.REQUIRED)
-    public void removeSomeSecuritiesBySymbol(String symbol, Integer invest_account_id, Integer cash_account_id, int quantity) {
-        Accounts account=getAccountById(invest_account_id);
+    public void removeSomeSecuritiesBySymbol(Securities security) {
+        Accounts account=getAccountById(security.getAccount_id());
 
-        double totalValue = account.removeSecurityQuantityBySymbol(symbol, quantity);
+        double totalValue = account.removeSecurityQuantityBySymbol(security.getSymbol(), security.getHoldings());
         if(totalValue>0.0){
             account.updateAmount(-totalValue);
             History history = new History("investment", new Date(), -totalValue, account.getId());
             account.addHistory(history);
             repository.save(account);
-            updateAccountCashAmount(invest_account_id, totalValue);
+            updateAccountCashAmount(security.getCash_account_id(), totalValue);
         }else if(totalValue == -1.0){     //chosen value is in fact all that is owned
-            removeAllSecurityBySymbol(symbol, invest_account_id, cash_account_id);
+            removeAllSecurityBySymbol(security);
         }else if(totalValue==0.0){
             // when trying to sell more than owned
             // Assuming that front end will handle this

@@ -6,6 +6,6 @@ Content-type: application/json
   "symbol" : "GM",
   "holdings" : "5",
   "account_id" : "4",
-  "cash_account" : "Wealth Simple"
+  "cash_account_id" : "2"
 }
 

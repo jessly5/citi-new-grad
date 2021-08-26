@@ -18,8 +18,8 @@ public interface AccountsService {
     public Securities addSecurity(Securities security) throws IOException;
 
     public void updateAccountCashAmount(Integer account_id, double changeInCash);
-    public void removeAllSecurityBySymbol(String symbol, Integer invest_account_id, Integer cash_account_id);
-    public void removeSomeSecuritiesBySymbol(String symbol, Integer invest_account_id, Integer cash_account_id, int quantity);
+    public void removeAllSecurityBySymbol(Securities security);
+    public void removeSomeSecuritiesBySymbol(Securities security);
     public void calculateInvestmentSummary();
     public Iterable<Accounts> updateAllSecurityInfo();
     public Iterable<Securities> getAllSecurities();

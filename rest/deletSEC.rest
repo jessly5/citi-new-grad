@@ -3,7 +3,8 @@ Content-type: application/json
 
 {
   "symbol" : "BABA",
-  "invest_account_id" : "5",
+  "account_id" : "5",
   "cash_account_id" : "1",
-  "quantity" : "2"
+  "holdings" : "2"
+
 }
