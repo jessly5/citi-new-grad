@@ -368,10 +368,11 @@ public class AccountsServiceImp implements AccountsService {
         try {
             Stock stock = YahooFinance.get(symbol);
             Securities securities =new Securities();
+            securities.setSymbol(symbol);
             securities.setCurrent_cost(stock.getQuote().getPrice().doubleValue());
             securities.setClosing_cost(stock.getQuote().getPreviousClose().doubleValue());
             return securities;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
