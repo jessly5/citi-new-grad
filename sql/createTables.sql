@@ -76,14 +76,18 @@ INSERT INTO securities(type, symbol, holdings, closing_cost, current_cost, accou
 ("ETF","QQQ", 5, 367.53, 368.56, 6);
 
 -- select * from securities;
-
+INSERT INTO history(account_type, transaction_date, amount, account_id) values
+("cash", "2020-11-15", -3456.74, 1),
+("cash", "2021-03-23", 1329.21, 1),
+("cash", "2021-06-03", 3000, 1),
+("cash", "2020-08-19", 1000, 2),
+("cash", "2020-10-04", -1856.83, 2),
+("cash", "2021-07-15", -653.35, 2),
+("cash", "2020-09-05", -3467.56,3),
+("cash", "2021-05-28", -2000,3),
+("cash", "2021-08-12", 5000,3);
 INSERT INTO history(account_type, transaction_date, amount) values
-("cash", "2020-11-15", 3000),
-("cash", "2021-06-15", -1000),
-("investment", "2021-06-15", 1000),
-("investment", "2021-07-15", 2000),
-("cash", "2021-07-15", -2000),
-("cash", "2021-08-12", 5000),
+
 ("investment",	"2020-08-29" , 489.21),
 ("investment",	"2020-09-04" ,  -307.03),
 ("investment",	"2020-09-09" ,  -376.38),
