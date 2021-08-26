@@ -36,7 +36,11 @@ public class AccountController {
 
     @RequestMapping(method=RequestMethod.GET,value = "/type/{type}")
     public Iterable<Accounts>  getAccountByType(@PathVariable("type") String type){
-        return accountsService.getAccountByType(type);
+        if(type.equals("cash")) {
+            return accountsService.getAccountByType(type);
+        }else{
+            return accountsService.updateAllSecurityInfo();
+        }
     }
 
     //TODO add appropriate url
@@ -128,7 +132,6 @@ public class AccountController {
 
     @RequestMapping(method=RequestMethod.DELETE, value="/{id}")
     public String deleteAccount(@PathVariable("id") int id){
-//        System.out.println(name);
         return accountsService.deletAccount(id);
     }
 

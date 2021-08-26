@@ -63,6 +63,7 @@ public class AccountsServiceImp implements AccountsService {
     @Transactional(propagation= Propagation.REQUIRED)
     public Iterable<Accounts> getAccountByType(String type) {
         return repository.findByType(type);
+
     }
 
     @Override
