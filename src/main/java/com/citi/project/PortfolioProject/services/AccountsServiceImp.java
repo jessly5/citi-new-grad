@@ -85,7 +85,6 @@ public class AccountsServiceImp implements AccountsService {
             History history = new History("investment", new Date(), money, account.getId());
             account.addHistory(history);
         } else {
-            //in case of being poor
             // Assuming front end will implement a check
             return null;
         }
